@@ -28,5 +28,6 @@ func run(filename string) error {
 	}
 	s := string(b)
 	fmt.Print(s)
+	_ = yyNewParser()
 	return nil
 }
