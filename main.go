@@ -31,6 +31,7 @@ type Lexer struct {
 }
 
 func NewLexer(src string) *Lexer {
+	// FIXME: This breaks tokens' locations.
 	s := strings.ReplaceAll(src, ";", " ;")
 	return &Lexer{
 		idx:    0,
