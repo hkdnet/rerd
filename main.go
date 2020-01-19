@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"io"
 	"io/ioutil"
 	"os"
 	"strings"
@@ -84,10 +85,32 @@ func run(filename string) error {
 		return errors.Wrap(err, "cannot read file")
 	}
 	s := string(b)
+	tables := parseTables(s)
+	tables = buildReferences(tables)
+	printErd(os.Stdout, tables)
+	return nil
+}
+
+func parseTables(s string) []Table {
 	p := yyNewParser()
 	l := NewLexer(s)
-	i := p.Parse(l)
-	fmt.Printf("i = %d\n", i)
-	fmt.Printf("%#v\n", l.result)
-	return nil
+	p.Parse(l)
+	return l.result
+}
+func buildReferences(tables []Table) []Table {
+	return tables
+}
+
+func printErd(w io.Writer, tables []Table) {
+	fmt.Fprintln(w, "@startuml \"erd\"")
+	for _, table := range tables {
+		fmt.Fprintf(w, "entity \"%s\" {\n", table.Name)
+		fmt.Fprintln(w, "\t+ id [PK]")
+		fmt.Fprintln(w, "\t==")
+		for _, column := range table.Columns {
+			fmt.Fprintf(w, "\t# %s\n", column.Name)
+		}
+		fmt.Fprintln(w, "}")
+	}
+	fmt.Fprintln(w, `@enduml`)
 }
