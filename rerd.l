@@ -3,7 +3,6 @@ package main
 
 import (
 	"fmt"
-	"os"
 )
 
 type Lexer struct {
@@ -12,8 +11,10 @@ type Lexer struct {
 	in   []byte
 	un   []byte
 	mark int
+
+	result []*Table // for parser
 }
-func (l*Lexer) Lex() (s string) {
+func (l*Lexer) lex() (s string) {
 %}
 
 %yyn l.next()
@@ -80,18 +81,4 @@ func (l*Lexer) next() {
 
 func (l*Lexer) unget(b byte) {
 	l.un = append(l.un, b)
-}
-
-func main() {
-	l := &Lexer {
-	    src: os.Args[1],
-	}
-	l.next()
-	for {
-		s := l.Lex()
-		fmt.Println(s)
-		if s == "EOF" {
-			break
-		}
-	}
 }

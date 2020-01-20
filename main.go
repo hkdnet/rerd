@@ -5,7 +5,6 @@ import (
 	"io"
 	"io/ioutil"
 	"os"
-	"strings"
 
 	"github.com/jinzhu/inflection"
 
@@ -23,22 +22,6 @@ func main() {
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
-	}
-}
-
-type Lexer struct {
-	idx    int
-	tokens []string
-
-	result []*Table
-}
-
-func NewLexer(src string) *Lexer {
-	// FIXME: This breaks tokens' locations.
-	s := strings.ReplaceAll(src, ";", " ;")
-	return &Lexer{
-		idx:    0,
-		tokens: strings.Fields(s),
 	}
 }
 
@@ -61,12 +44,10 @@ type Column struct {
 }
 
 func (l *Lexer) Lex(lval *yySymType) int {
-	if l.idx >= len(l.tokens) {
+	s := l.lex()
+	if s == "EOF" {
 		return 0
 	}
-	s := l.tokens[l.idx]
-	l.idx++
-
 	if s == "{" {
 		return int('{')
 	} else if s == "}" {
@@ -96,7 +77,7 @@ func run(filename string) error {
 
 func parseTables(s string) []*Table {
 	p := yyNewParser()
-	l := NewLexer(s)
+	l := &Lexer{src: s}
 	p.Parse(l)
 	return l.result
 }
