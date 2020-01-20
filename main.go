@@ -51,6 +51,7 @@ type Column struct {
 
 func (l *Lexer) Lex(lval *yySymType) int {
 	res := l.lex()
+	fmt.Printf("DEBUG: lex is finished: %#v\n", res)
 	if res.eof {
 		return 0
 	}
