@@ -1,3 +1,6 @@
-table1 {
-  col1;
+users {
+  office_id;
+  name;
+}
+offices {
 }

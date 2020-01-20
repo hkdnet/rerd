@@ -7,6 +7,8 @@ import (
 	"os"
 	"strings"
 
+	"github.com/jinzhu/inflection"
+
 	"github.com/pkg/errors"
 )
 
@@ -97,7 +99,26 @@ func parseTables(s string) []Table {
 	p.Parse(l)
 	return l.result
 }
+
 func buildReferences(tables []Table) []Table {
+	m := make(map[string]Table)
+	for _, table := range tables {
+		singularName := inflection.Singular(table.Name)
+		m[singularName] = table
+	}
+
+	for _, table := range tables {
+		for _, col := range table.Columns {
+			if endWith(col.Name, "_id") {
+				if t, ok := m[col.Name[0:len(col.Name)-3]]; ok {
+					fmt.Printf("Found reference to %s\n", t.Name)
+				} else {
+					fmt.Printf("Found reference-ish column but not found table `%s`.`%s`\n", table.Name, col.Name)
+				}
+			}
+		}
+	}
+
 	return tables
 }
 
