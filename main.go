@@ -31,6 +31,11 @@ type Token struct {
 	lBrace bool
 	rBrace bool
 }
+type LexResult struct {
+	val string
+
+	eof bool
+}
 type Table struct {
 	Name       string
 	Columns    []*Column
@@ -44,10 +49,11 @@ type Column struct {
 }
 
 func (l *Lexer) Lex(lval *yySymType) int {
-	s := l.lex()
-	if s == "EOF" {
+	res := l.lex()
+	if res.eof {
 		return 0
 	}
+	s := res.val
 	if s == "{" {
 		return int('{')
 	} else if s == "}" {

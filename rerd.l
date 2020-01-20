@@ -14,7 +14,8 @@ type Lexer struct {
 
 	result []*Table // for parser
 }
-func (l*Lexer) lex() (s string) {
+func (l*Lexer) lex() LexResult {
+	var s string
 %}
 
 %yyn l.next()
@@ -26,10 +27,10 @@ func (l*Lexer) lex() (s string) {
 	l.mark = -1
 
 \0
-	return "EOF"
+	return LexResult{eof: true}
 
 a([bcd]*z([efg]*z)?)?
-	return fmt.Sprintf("match(%q)", l.in)
+	return LexResult{val: fmt.Sprintf("match(%q)", l.in) }
 
 %%
 	if l.mark >= 0 {
@@ -58,7 +59,7 @@ a([bcd]*z([efg]*z)?)?
 		}
 		l.c = l.in[1] // y
 	}
-	return
+	return LexResult{val: s}
 }
 
 func (l*Lexer) next() {
