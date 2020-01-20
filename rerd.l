@@ -15,7 +15,6 @@ type Lexer struct {
 	result []*Table // for parser
 }
 func (l*Lexer) lex() LexResult {
-	var s string
 %}
 
 %yyn l.next()
@@ -47,7 +46,7 @@ func (l*Lexer) lex() LexResult {
 		goto yyAction // Hook: Execute the semantic action of the last matched rule.
 	}
 
-    s = string(l.c)
+    s := string(l.c)
     l.next()
 	return LexResult{val: s}
 }
