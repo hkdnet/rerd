@@ -30,7 +30,7 @@ type Lexer struct {
 	idx    int
 	tokens []string
 
-	result []Table
+	result []*Table
 }
 
 func NewLexer(src string) *Lexer {
@@ -50,7 +50,7 @@ type Token struct {
 }
 type Table struct {
 	Name    string
-	Columns []Column
+	Columns []*Column
 }
 type Column struct {
 	Name string
@@ -88,20 +88,20 @@ func run(filename string) error {
 	}
 	s := string(b)
 	tables := parseTables(s)
-	tables = buildReferences(tables)
+	buildReferences(tables)
 	printErd(os.Stdout, tables)
 	return nil
 }
 
-func parseTables(s string) []Table {
+func parseTables(s string) []*Table {
 	p := yyNewParser()
 	l := NewLexer(s)
 	p.Parse(l)
 	return l.result
 }
 
-func buildReferences(tables []Table) []Table {
-	m := make(map[string]Table)
+func buildReferences(tables []*Table) {
+	m := make(map[string]*Table)
 	for _, table := range tables {
 		singularName := inflection.Singular(table.Name)
 		m[singularName] = table
@@ -118,11 +118,9 @@ func buildReferences(tables []Table) []Table {
 			}
 		}
 	}
-
-	return tables
 }
 
-func printErd(w io.Writer, tables []Table) {
+func printErd(w io.Writer, tables []*Table) {
 	fmt.Fprintln(w, "@startuml \"erd\"")
 	for _, table := range tables {
 		fmt.Fprintf(w, "entity \"%s\" {\n", table.Name)

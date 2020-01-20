@@ -3,12 +3,12 @@ package main
 %}
 %start program
 %union {
-	program []Table
+	program []*Table
 	token Token
-	tables []Table
-	table Table
-	columns []Column
-	column Column
+	tables []*Table
+	table *Table
+	columns []*Column
+	column *Column
 }
 %type<program> program
 %type<tables> tables
@@ -26,22 +26,22 @@ program: tables {
 }
 
 ;
-tables : { $$ = make([]Table, 0) }
+tables : { $$ = make([]*Table, 0) }
   | table tables {
 	$$ = append($2, $1)
   }
 ;
 table : identifier '{' columns '}' {
-	$$ = Table { Name: $1.identifier, Columns: $3 }
+	$$ = &Table { Name: $1.identifier, Columns: $3 }
 }
 ;
-columns : { $$ = make([]Column, 0) }
+columns : { $$ = make([]*Column, 0) }
   | column columns {
 	$$ = append($2, $1)
   }
 ;
 column : identifier ';' {
-	$$ = Column{Name: $1.identifier}
+	$$ = &Column{Name: $1.identifier}
 }
 ;
 %%
