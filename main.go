@@ -35,6 +35,7 @@ type LexResult struct {
 	val string
 
 	eof bool
+	// TODO: col, line
 }
 type Table struct {
 	Name       string
