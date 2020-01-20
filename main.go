@@ -85,6 +85,7 @@ func run(filename string) error {
 func parseTables(s string) []*Table {
 	p := yyNewParser()
 	l := &Lexer{src: s}
+	l.next()
 	p.Parse(l)
 	return l.result
 }

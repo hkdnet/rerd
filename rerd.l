@@ -29,8 +29,10 @@ func (l*Lexer) lex() LexResult {
 \0
 	return LexResult{eof: true}
 
-a([bcd]*z([efg]*z)?)?
-	return LexResult{val: fmt.Sprintf("match(%q)", l.in) }
+[a-zA-Z0-9_-]+
+	return LexResult{val: string(l.in) }
+
+[ \t\n\r]+          // Ignore whitespace
 
 %%
 	if l.mark >= 0 {
