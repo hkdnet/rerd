@@ -49,14 +49,15 @@ type Token struct {
 	rBrace bool
 }
 type Table struct {
-	Name    string
-	Columns []*Column
+	Name       string
+	Columns    []*Column
+	References []*Table
 }
 type Column struct {
 	Name string
 	// type string
 
-	Reference string
+	Reference *Table
 }
 
 func (l *Lexer) Lex(lval *yySymType) int {
@@ -111,10 +112,17 @@ func buildReferences(tables []*Table) {
 		for _, col := range table.Columns {
 			if endWith(col.Name, "_id") {
 				if t, ok := m[col.Name[0:len(col.Name)-3]]; ok {
-					fmt.Printf("Found reference to %s\n", t.Name)
+					col.Reference = t
 				} else {
 					fmt.Printf("Found reference-ish column but not found table `%s`.`%s`\n", table.Name, col.Name)
 				}
+			}
+		}
+	}
+	for _, table := range tables {
+		for _, col := range table.Columns {
+			if col.Reference != nil {
+				table.References = append(table.References, col.Reference)
 			}
 		}
 	}
@@ -130,6 +138,9 @@ func printErd(w io.Writer, tables []*Table) {
 			fmt.Fprintf(w, "\t# %s\n", column.Name)
 		}
 		fmt.Fprintln(w, "}")
+		for _, ref := range table.References {
+			fmt.Fprintf(w, "%s --o{ %s\n", ref.Name, table.Name)
+		}
 	}
 	fmt.Fprintln(w, `@enduml`)
 }
