@@ -1,4 +1,4 @@
-bin/rerd: *.go parser/y.go parser/l.go
+bin/rerd: cmd/rerd/main.go *.go parser/*.go
 	go build -o bin/rerd cmd/rerd/main.go
 
 parser/y.go: rerd.y
