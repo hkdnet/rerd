@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"os"
 
+	"github.com/hkdnet/rerd/parser"
 	"github.com/jinzhu/inflection"
 
 	"github.com/pkg/errors"
@@ -25,74 +26,20 @@ func main() {
 	}
 }
 
-type Token struct {
-	identifier string
-
-	lBrace bool
-	rBrace bool
-}
-type LexResult struct {
-	val string
-
-	eof bool
-	// TODO: col, line
-}
-type Table struct {
-	Name       string
-	Columns    []*Column
-	References []*Table
-}
-type Column struct {
-	Name string
-	// type string
-
-	Reference *Table
-}
-
-func (l *Lexer) Lex(lval *yySymType) int {
-	res := l.lex()
-	fmt.Printf("DEBUG: lex is finished: %#v\n", res)
-	if res.eof {
-		return 0
-	}
-	s := res.val
-	if s == "{" {
-		return int('{')
-	} else if s == "}" {
-		return int('}')
-	} else if s == ";" {
-		return int(';')
-	} else {
-		lval.token = Token{identifier: s}
-		return identifier
-	}
-}
-func (l *Lexer) Error(s string) {
-	panic(s)
-}
-
 func run(filename string) error {
 	b, err := ioutil.ReadFile(filename)
 	if err != nil {
 		return errors.Wrap(err, "cannot read file")
 	}
 	s := string(b)
-	tables := parseTables(s)
+	tables := parser.ParseTables(s)
 	buildReferences(tables)
 	printErd(os.Stdout, tables)
 	return nil
 }
 
-func parseTables(s string) []*Table {
-	p := yyNewParser()
-	l := &Lexer{src: s}
-	l.next()
-	p.Parse(l)
-	return l.result
-}
-
-func buildReferences(tables []*Table) {
-	m := make(map[string]*Table)
+func buildReferences(tables []*parser.Table) {
+	m := make(map[string]*parser.Table)
 	for _, table := range tables {
 		singularName := inflection.Singular(table.Name)
 		m[singularName] = table
@@ -118,7 +65,7 @@ func buildReferences(tables []*Table) {
 	}
 }
 
-func printErd(w io.Writer, tables []*Table) {
+func printErd(w io.Writer, tables []*parser.Table) {
 	fmt.Fprintln(w, "@startuml \"erd\"")
 	for _, table := range tables {
 		fmt.Fprintf(w, "entity \"%s\" {\n", table.Name)

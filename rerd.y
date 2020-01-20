@@ -1,5 +1,5 @@
 %{
-package main
+package parser
 %}
 %start program
 %union {

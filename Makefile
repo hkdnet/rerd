@@ -1,8 +1,8 @@
-bin/rerd: main.go y.go l.go
-	go build -o bin/rerd main.go y.go util.go l.go
+bin/rerd: main.go parser/y.go parser/l.go
+	go build -o bin/rerd main.go util.go
 
-y.go: rerd.y
-	goyacc rerd.y
+parser/y.go: rerd.y
+	goyacc -o parser/y.go rerd.y
 
-l.go: rerd.l
-	golex -o l.go rerd.l
+parser/l.go: rerd.l
+	golex -o parser/l.go rerd.l
