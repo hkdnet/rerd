@@ -47,20 +47,8 @@ func (l*Lexer) lex() LexResult {
 		goto yyAction // Hook: Execute the semantic action of the last matched rule.
 	}
 
-	switch n := len(l.in); n {
-	case 0: // [] z
-		s = fmt.Sprintf("%q", l.c)
-		l.next()
-	case 1: // [x] z
-		s = fmt.Sprintf("%q", l.in[0])
-	default: // [x, y, ...], z
-		s = fmt.Sprintf("%q", l.in[0])
-		l.unget(l.c) // z
-		for i := n - 1; i > 1; i-- {
-			l.unget(l.in[i]) // ...
-		}
-		l.c = l.in[1] // y
-	}
+    s = string(l.c)
+    l.next()
 	return LexResult{val: s}
 }
 
